@@ -1,0 +1,71 @@
+{
+  "event_code": "igacmun-session-3-2025",
+  "certificates": [
+    {
+      "certificate_type": "MUN Participant",
+      "participant_name": "Osayeed Jaber",
+      "school": "IJUW HS",
+      "date_issued": "2025-03-15",
+      "country": "United States",
+      "committee": "UNSC"
+    },
+    {
+      "certificate_type": "Campus Ambassador",
+      "participant_name": "Jane Doe",
+      "school": "ABC High School",
+      "date_issued": "2025-03-15",
+      "country": "Canada",
+      "committee": "GA"
+    },
+    {
+      "certificate_type": "Secretariat Board Member",
+      "participant_name": "John Smith",
+      "school": "XYZ Academy",
+      "date_issued": "2025-03-15",
+      "country": "United Kingdom",
+      "committee": "UNHRC"
+    },
+    {
+      "certificate_type": "Special Mention 1",
+      "participant_name": "Alice Johnson",
+      "school": "ABC High School",
+      "date_issued": "2025-03-15"
+    },
+    {
+      "certificate_type": "Special Mention 2",
+      "participant_name": "Bob Wilson",
+      "school": "XYZ Academy",
+      "date_issued": "2025-03-15"
+    },
+    {
+      "certificate_type": "Special Mention 3",
+      "participant_name": "Charlie Brown",
+      "school": "DEF School",
+      "date_issued": "2025-03-15"
+    },
+    {
+      "certificate_type": "Special Mention 5",
+      "participant_name": "David Lee",
+      "school": "GHI Institute",
+      "date_issued": "2025-03-15"
+    },
+    {
+      "certificate_type": "BizCom Participant",
+      "participant_name": "Eve Martinez",
+      "school": "Business School",
+      "date_issued": "2025-03-15",
+      "segment": "Finance",
+      "team_name": "Team Alpha",
+      "team_members": ["Eve Martinez", "Frank White", "Grace Green"]
+    },
+    {
+      "certificate_type": "BizCom Winner",
+      "participant_name": "Henry Black",
+      "school": "Commerce College",
+      "date_issued": "2025-03-15",
+      "segment": "Marketing",
+      "team_name": "Team Beta"
+    }
+  ]
+}
+

@@ -1,0 +1,41 @@
+Convert my certificate data into JSON for bulk import. Use this structure:
+
+{
+  "event_code": "igacmun-session-3-2025",
+  "certificates": [
+    {
+      "certificate_type": "string",
+      "participant_name": "string",
+      "school": "string (REQUIRED for all)",
+      "date_issued": "YYYY-MM-DD (REQUIRED for all)",
+      // Additional fields based on type
+    }
+  ]
+}
+
+CERTIFICATE TYPES & REQUIREMENTS:
+
+1. MUN Certificates (types: "MUN Participant", "Campus Ambassador", "Secretariat Board Member"):
+   REQUIRED: certificate_type, participant_name, school, country (single string), committee, date_issued
+
+2. Special Mention (types: "Special Mention 1", "Special Mention 2", "Special Mention 3", "Special Mention 5"):
+   REQUIRED: certificate_type (MUST include number), participant_name, school, date_issued
+   OPTIONAL: country, committee, email
+   NOTE: "Special Mention" without number is INVALID - use numbered version
+
+3. BizCom (types: "BizCom Participant", "BizCom Winner"):
+   REQUIRED: certificate_type, participant_name, school, segment, team_name, date_issued
+   OPTIONAL: team_members (array)
+
+RULES:
+- ALL certificates need: certificate_type, participant_name, school, date_issued
+- MUN needs: country (single string, not array), committee
+- If multiple countries exist, use first as "country", store rest in custom_fields.countries
+- Dates must be YYYY-MM-DD format
+- Extra fields go in custom_fields object
+- If "Special Mention" has no number, ask me or default to "Special Mention 1"
+
+Format my data now:
+
+[Paste your data here]
+
