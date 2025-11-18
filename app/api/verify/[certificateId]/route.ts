@@ -4,10 +4,10 @@ import { headers } from 'next/headers'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ certificateId: string }> }
+  { params }: { params: { certificateId: string } }
 ) {
   try {
-    const { certificateId } = await params
+    const { certificateId } = params
     const supabase = await createClient()
     
     // Get certificate with all related data
@@ -89,9 +89,15 @@ export async function GET(
 
 function formatCertificateResponse(certificate: any) {
   const metadata = (certificate.certificate_metadata || []).reduce((acc: any, meta: any) => {
-    acc[meta.field_name] = meta.field_type === 'json' || meta.field_type === 'array' 
-      ? JSON.parse(meta.field_value) 
-      : meta.field_value
+    if (meta.field_type === 'json' || meta.field_type === 'array') {
+      try {
+        acc[meta.field_name] = JSON.parse(meta.field_value);
+      } catch {
+        acc[meta.field_name] = meta.field_value;
+      }
+    } else {
+      acc[meta.field_name] = meta.field_value;
+    }
     return acc
   }, {})
   

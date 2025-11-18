@@ -3,6 +3,7 @@
 import { Database } from "@/types/database";
 import { useRouter } from "next/navigation";
 import { formatDateReadable } from "@/lib/utils/date-format";
+import CertificateStatusBadge from "./CertificateStatusBadge";
 
 type CertificateRow = Database["public"]["Tables"]["certificates"]["Row"] & {
   events?: { event_name: string | null; event_code: string | null } | null;
@@ -67,7 +68,7 @@ export default function RecentCertificates({
                   {certificate.certificate_type}
                 </td>
                 <td className="px-4 py-3">
-                  <StatusBadge status={certificate.status} />
+                  <CertificateStatusBadge status={certificate.status} />
                 </td>
                     <td className="px-4 py-3 text-slate-200">
                       {certificate.date_issued
@@ -91,21 +92,6 @@ export default function RecentCertificates({
         </table>
       </div>
     </section>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const config =
-    status === "revoked"
-      ? "bg-rose-500/20 text-rose-200 border-rose-500/30"
-      : "bg-emerald-500/20 text-emerald-200 border-emerald-500/30";
-
-  return (
-    <span
-      className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${config}`}
-    >
-      {status}
-    </span>
   );
 }
 

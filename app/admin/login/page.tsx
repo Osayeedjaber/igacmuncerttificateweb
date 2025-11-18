@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import SignInRequestForm from "@/components/admin/SignInRequestForm";
 import LoginForm from "@/components/LoginForm";
 import { ToastProvider } from "@/components/dashboard/ToastProvider";
@@ -15,10 +16,13 @@ export default function AdminLoginPage() {
           <div className="mb-8 space-y-4 text-center">
             <div className="flex justify-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 p-3">
-                <img
+                <Image
                   src="/IGAC Logo White NOBG@4x-8 (1).png"
                   alt="IGAC Logo"
+                  width={64}
+                  height={64}
                   className="h-full w-full object-contain"
+                  priority
                 />
               </div>
             </div>

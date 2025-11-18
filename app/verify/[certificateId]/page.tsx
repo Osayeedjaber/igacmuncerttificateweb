@@ -26,10 +26,10 @@ type CertificateData = {
 export default function CertificateVerifyPage({
   params,
 }: {
-  params: Promise<{ certificateId: string }>;
+  params: { certificateId: string };
 }) {
   const router = useRouter();
-  const [certificateId, setCertificateId] = useState<string>("");
+  const [certificateId, setCertificateId] = useState<string>(params.certificateId);
   const [loading, setLoading] = useState(true);
   const [certificate, setCertificate] = useState<CertificateData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -39,11 +39,11 @@ export default function CertificateVerifyPage({
     revoked_at: string;
     revoked_reason: string;
   } | null>(null);
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchCertificate() {
-      const resolvedParams = await params;
-      const id = resolvedParams.certificateId;
+      const id = params.certificateId;
       setCertificateId(id);
       setLoading(true);
 
@@ -124,10 +124,13 @@ export default function CertificateVerifyPage({
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 p-3">
-              <img
+              <Image
                 src="/IGAC Logo White NOBG@4x-8 (1).png"
                 alt="IGAC Logo"
+                width={64}
+                height={64}
                 className="h-full w-full object-contain"
+                priority
               />
             </div>
           </div>
@@ -294,10 +297,17 @@ export default function CertificateVerifyPage({
               <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${window.location.origin}/verify/${certificate.certificate_id}`
-                    );
-                    alert("Certificate link copied to clipboard!");
+                    const url = `${window.location.origin}/verify/${certificate.certificate_id}`;
+                    navigator.clipboard
+                      .writeText(url)
+                      .then(() => {
+                        setCopyMessage("Certificate link copied to clipboard.");
+                        setTimeout(() => setCopyMessage(null), 3000);
+                      })
+                      .catch(() => {
+                        setCopyMessage("Unable to copy link. You can copy it manually from the address bar.");
+                        setTimeout(() => setCopyMessage(null), 4000);
+                      });
                   }}
                   className="flex items-center justify-center gap-2 flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                 >
@@ -327,6 +337,11 @@ export default function CertificateVerifyPage({
                   Verify Another
                 </button>
               </div>
+              {copyMessage && (
+                <p className="mt-2 w-full text-xs text-emerald-300">
+                  {copyMessage}
+                </p>
+              )}
             </div>
           )}
         </div>

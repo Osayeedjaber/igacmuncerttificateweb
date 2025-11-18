@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import LogoutButton from "./LogoutButton";
 import { DashboardIcon, CertificateIcon, EventIcon, UsersIcon } from "./Icons";
 
@@ -22,10 +23,13 @@ export default function Sidebar({ user }: { user: { email: string; role: string 
         <div className="border-b border-white/10 p-6">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 p-2">
-              <img
+              <Image
                 src="/IGAC Logo White NOBG@4x-8 (1).png"
                 alt="IGAC Logo"
+                width={48}
+                height={48}
                 className="h-full w-full object-contain"
+                priority
               />
             </div>
             <div>

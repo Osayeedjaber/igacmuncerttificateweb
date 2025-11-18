@@ -20,8 +20,10 @@ function generateShortCode(input: string): string {
 
 /**
  * Generate a short, unique certificate ID
- * Format: {eventCode}-{shortCode}
- * Example: igacmun-session-3-2025-a3k9j2x1
+ * Example: "sbsj23" (6-8 lowercase letters/digits)
+ *
+ * The arguments are accepted for backwards compatibility but are only used
+ * to add variability to the input; the final ID is always a short random code.
  */
 export function generateCertificateId(
   eventCode: string,
@@ -29,14 +31,9 @@ export function generateCertificateId(
   participantName: string,
   school: string
 ): string {
-  // Create a unique input string from participant data + timestamp
-  const uniqueInput = `${participantName}-${school}-${year}-${Date.now()}-${Math.random()}`
-  
-  // Generate short code
+  const uniqueInput = `${eventCode}-${year}-${participantName}-${school}-${Date.now()}-${Math.random()}`
   const shortCode = generateShortCode(uniqueInput)
-  
-  // Return format: eventCode-shortCode
-  return `${eventCode}-${shortCode}`
+  return shortCode
 }
 
 export async function ensureUniqueCertificateId(

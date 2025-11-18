@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import { Database } from "@/types/database";
 import { useRouter } from "next/navigation";
 import SearchBar from "./SearchBar";
+import BulkActions from "./BulkActions";
+import CertificateStatusBadge from "./CertificateStatusBadge";
 
 type CertificateRow = Database["public"]["Tables"]["certificates"]["Row"] & {
   events?: { event_name: string | null; event_code: string | null } | null;
@@ -24,6 +26,7 @@ export default function CertificatesList({
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "revoked">("all");
   const [filterEvent, setFilterEvent] = useState<string>("all");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Get unique events for filter
   const events = useMemo(() => {
@@ -39,11 +42,12 @@ export default function CertificatesList({
   // Filter certificates
   const filteredCertificates = useMemo(() => {
     return certificates.filter((cert) => {
+      const query = searchQuery.toLowerCase();
       const matchesSearch =
-        cert.participant_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cert.certificate_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cert.school.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        cert.certificate_type.toLowerCase().includes(searchQuery.toLowerCase());
+        cert.participant_name.toLowerCase().includes(query) ||
+        cert.certificate_id.toLowerCase().includes(query) ||
+        cert.school.toLowerCase().includes(query) ||
+        cert.certificate_type.toLowerCase().includes(query);
 
       const matchesStatus =
         filterStatus === "all" || cert.status === filterStatus;
@@ -54,6 +58,30 @@ export default function CertificatesList({
       return matchesSearch && matchesStatus && matchesEvent;
     });
   }, [certificates, searchQuery, filterStatus, filterEvent]);
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((existingId) => existingId !== id) : [...prev, id]
+    );
+  };
+
+  const clearSelection = () => setSelectedIds([]);
+
+  const selectedCertificates = useMemo(
+    () =>
+      certificates
+        .filter((cert) => selectedIds.includes(cert.id))
+        .map((cert) => ({
+          id: cert.id,
+          certificate_id: cert.certificate_id,
+          participant_name: cert.participant_name,
+        })),
+    [certificates, selectedIds]
+  );
+
+  const allVisibleSelected =
+    filteredCertificates.length > 0 &&
+    filteredCertificates.every((cert) => selectedIds.includes(cert.id));
 
   return (
     <div className="space-y-4">
@@ -100,6 +128,30 @@ export default function CertificatesList({
           <table className="w-full text-left text-sm text-slate-200">
             <thead className="bg-slate-900/80 text-xs uppercase tracking-[0.3em] text-slate-400">
               <tr>
+                <th className="px-4 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleSelected}
+                    onChange={() => {
+                      if (allVisibleSelected) {
+                        // Deselect all visible
+                        setSelectedIds((prev) =>
+                          prev.filter(
+                            (id) => !filteredCertificates.some((cert) => cert.id === id)
+                          )
+                        );
+                      } else {
+                        // Select all visible
+                        const visibleIds = filteredCertificates.map((cert) => cert.id);
+                        setSelectedIds((prev) => [
+                          ...prev,
+                          ...visibleIds.filter((id) => !prev.includes(id)),
+                        ]);
+                      }
+                    }}
+                    className="h-4 w-4 rounded border-white/20 bg-slate-900/60 text-emerald-500 focus:ring-emerald-500/40"
+                  />
+                </th>
                 <th className="px-4 py-3">Participant</th>
                 <th className="px-4 py-3">Certificate ID</th>
                 <th className="px-4 py-3">Event</th>
@@ -117,6 +169,15 @@ export default function CertificatesList({
                   onClick={() => router.push(`/admin/dashboard/certificates/${certificate.id}`)}
                 >
                   <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(certificate.id)}
+                      onChange={() => toggleSelection(certificate.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="h-4 w-4 rounded border-white/20 bg-slate-900/60 text-emerald-500 focus:ring-emerald-500/40"
+                    />
+                  </td>
+                  <td className="px-4 py-3">
                     <div className="font-semibold">{certificate.participant_name}</div>
                     <p className="text-xs text-slate-300">{certificate.school}</p>
                   </td>
@@ -133,7 +194,7 @@ export default function CertificatesList({
                     {certificate.certificate_type}
                   </td>
                   <td className="px-4 py-3">
-                    <StatusBadge status={certificate.status} />
+                    <CertificateStatusBadge status={certificate.status} />
                   </td>
                   <td className="px-4 py-3 text-slate-200">
                     {certificate.date_issued
@@ -148,7 +209,7 @@ export default function CertificatesList({
               {filteredCertificates.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-4 py-6 text-center text-slate-400"
                   >
                     No certificates found matching your filters.
@@ -159,22 +220,13 @@ export default function CertificatesList({
           </table>
         </div>
       </div>
+
+      <BulkActions
+        selectedCertificates={selectedCertificates}
+        onClearSelection={clearSelection}
+      />
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const config =
-    status === "revoked"
-      ? "bg-rose-500/20 text-rose-200 border-rose-500/30"
-      : "bg-emerald-500/20 text-emerald-200 border-emerald-500/30";
-
-  return (
-    <span
-      className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${config}`}
-    >
-      {status}
-    </span>
-  );
-}
 

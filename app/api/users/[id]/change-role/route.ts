@@ -5,11 +5,11 @@ import { requireSuperAdmin } from '@/lib/utils/auth'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await requireSuperAdmin()
-    const { id } = await params
+    const { id } = params
     const body = await request.json()
     const { new_role, password } = body
 

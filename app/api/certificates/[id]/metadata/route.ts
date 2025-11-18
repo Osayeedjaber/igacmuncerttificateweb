@@ -4,11 +4,11 @@ import { requireAdmin } from '@/lib/utils/auth'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     await requireAdmin()
-    const { id } = await params
+    const { id } = params
     const supabase = await createClient()
     const body = await request.json()
     const { metadata } = body

@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./ToastProvider";
 import ConfirmationDialog from "./ConfirmationDialog";
-import { formatDateReadable } from "@/lib/utils/date-format";
+import CertificateStatusBadge from "./CertificateStatusBadge";
+import { formatDateReadable, formatDateTimeReadable } from "@/lib/utils/date-format";
 
 type Certificate = Database["public"]["Tables"]["certificates"]["Row"] & {
   events?: Database["public"]["Tables"]["events"]["Row"] | null;
@@ -36,14 +37,19 @@ export default function CertificateDetailView({
   // Check if user can edit (admin or super_admin)
   const canEdit = user.role === "admin" || user.role === "super_admin";
 
-  // Organize metadata into an object
+// Organize metadata into an object
   const metadata = (certificate.certificate_metadata || []).reduce((acc: any, meta: any) => {
-    acc[meta.field_name] =
-      meta.field_type === "json" || meta.field_type === "array"
-        ? JSON.parse(meta.field_value)
-        : meta.field_value;
+    if (meta.field_type === "json" || meta.field_type === "array") {
+      try {
+        acc[meta.field_name] = JSON.parse(meta.field_value);
+      } catch {
+        acc[meta.field_name] = meta.field_value;
+      }
+    } else {
+      acc[meta.field_name] = meta.field_value;
+    }
     return acc;
-  }, {});
+  }, {} as Record<string, unknown>);
 
   const [formData, setFormData] = useState({
     participant_name: certificate.participant_name,
@@ -277,15 +283,7 @@ export default function CertificateDetailView({
               </select>
             ) : (
               <div className="input bg-slate-950/50">
-                <span
-                  className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase ${
-                    formData.status === "revoked"
-                      ? "bg-rose-500/20 text-rose-200 border-rose-500/30"
-                      : "bg-emerald-500/20 text-emerald-200 border-emerald-500/30"
-                  }`}
-                >
-                  {formData.status}
-                </span>
+                <CertificateStatusBadge status={formData.status} />
               </div>
             )}
           </Field>
@@ -361,7 +359,7 @@ export default function CertificateDetailView({
             </p>
             <p className="text-sm text-white">
               {certificate.last_verified_at
-                ? new Date(certificate.last_verified_at).toLocaleString()
+                ? formatDateTimeReadable(certificate.last_verified_at)
                 : "Never"}
             </p>
           </div>

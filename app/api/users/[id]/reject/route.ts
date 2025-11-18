@@ -4,11 +4,11 @@ import { requireSuperAdmin } from '@/lib/utils/auth'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
     const user = await requireSuperAdmin()
-    const { id } = await params
+    const { id } = params
     const supabase = await createClient()
     
     const { data, error } = await (supabase as any)

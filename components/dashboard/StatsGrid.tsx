@@ -3,6 +3,7 @@ type StatsGridProps = {
   totalCertificates: number;
   revokedCount: number;
   verificationCount: number;
+  pendingUsers: number;
 };
 
 const statsConfig = [
@@ -25,6 +26,11 @@ const statsConfig = [
     label: "Verifications",
     key: "verificationCount",
     accent: "from-indigo-500/20 to-indigo-500/0",
+  },
+  {
+    label: "Pending Access",
+    key: "pendingUsers",
+    accent: "from-amber-500/20 to-amber-500/0",
   },
 ];
 

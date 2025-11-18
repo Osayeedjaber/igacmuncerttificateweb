@@ -36,6 +36,24 @@ export function formatDateReadable(date: Date | string): string {
 }
 
 /**
+ * Format date & time in a readable format (e.g., "Jan 15, 2025 14:30")
+ * Uses consistent format to avoid locale differences
+ */
+export function formatDateTimeReadable(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) {
+    return 'Invalid date';
+  }
+
+  const datePart = formatDateReadable(d);
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+
+  return `${datePart} ${hours}:${minutes}`;
+}
+
+/**
  * Get current date in YYYY-MM-DD format
  * Safe for use in initial state
  */

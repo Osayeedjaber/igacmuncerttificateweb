@@ -20,7 +20,7 @@ export default function KeyboardShortcuts() {
       // Ctrl/Cmd + N for new event
       if ((e.ctrlKey || e.metaKey) && e.key === "n") {
         e.preventDefault();
-        router.push("/dashboard/events");
+        router.push("/admin/dashboard/events");
       }
 
       // Escape to close modals/dialogs

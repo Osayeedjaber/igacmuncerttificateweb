@@ -13,6 +13,9 @@ export default function UserManagement({ users }: { users: UserRow[] }) {
   const router = useRouter();
   const toast = useToast();
   const [loading, setLoading] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "pending_approval" | "approved" | "rejected"
+  >("pending_approval");
   const [roleChangeDialog, setRoleChangeDialog] = useState<{
     isOpen: boolean;
     userId: string;
@@ -95,6 +98,10 @@ export default function UserManagement({ users }: { users: UserRow[] }) {
     }
   };
 
+  const filteredUsers = users.filter((user) =>
+    statusFilter === "all" ? true : user.account_status === statusFilter
+  );
+
   const getRoleBadge = (role: string) => {
     const colors =
       role === "super_admin"
@@ -130,6 +137,29 @@ export default function UserManagement({ users }: { users: UserRow[] }) {
   return (
     <>
       <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-6">
+        <div className="mb-4 flex flex-wrap gap-2">
+          {[
+            { id: "pending_approval", label: "Pending" },
+            { id: "approved", label: "Approved" },
+            { id: "rejected", label: "Rejected" },
+            { id: "all", label: "All" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() =>
+                setStatusFilter(tab.id as "all" | "pending_approval" | "approved" | "rejected")
+              }
+              className={`rounded-xl px-3 py-1.5 text-xs font-semibold tracking-wide transition ${
+                statusFilter === tab.id
+                  ? "bg-emerald-500 text-emerald-950"
+                  : "bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         <div className="overflow-hidden rounded-xl border border-white/5">
           <table className="w-full text-left text-sm text-slate-200">
             <thead className="bg-slate-900/80 text-xs uppercase tracking-[0.3em] text-slate-400">
@@ -142,7 +172,7 @@ export default function UserManagement({ users }: { users: UserRow[] }) {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <tr
                   key={user.id}
                   className="border-t border-white/5 bg-white/5 text-sm text-white"

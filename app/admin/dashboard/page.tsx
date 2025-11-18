@@ -1,11 +1,4 @@
-import StatsGrid from "@/components/dashboard/StatsGrid";
-import EventManager from "@/components/dashboard/EventManager";
-import BulkImportUploader from "@/components/dashboard/BulkImportUploader";
-import ManualCertificateForm from "@/components/dashboard/ManualCertificateForm";
-import RecentCertificates from "@/components/dashboard/RecentCertificates";
-import ActivityFeed from "@/components/dashboard/ActivityFeed";
-import QuickActions from "@/components/dashboard/QuickActions";
-import AnalyticsChart from "@/components/dashboard/AnalyticsChart";
+import AdminDashboardContent from "@/components/dashboard/AdminDashboardContent";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/utils/auth";
 import { Database } from "@/types/database";
@@ -41,6 +34,7 @@ export default async function DashboardPage() {
     { count: totalCertificates },
     { count: revokedCount },
     { data: verificationData },
+    { count: pendingUsers },
   ] =
     await Promise.all([
       supabase
@@ -51,6 +45,10 @@ export default async function DashboardPage() {
         .select("id", { count: "exact", head: true })
         .eq("status", "revoked"),
       supabase.from("certificates").select("verification_count"),
+      supabase
+        .from("users")
+        .select("id", { count: "exact", head: true })
+        .eq("account_status", "pending_approval"),
     ]);
 
   const verificationRows =
@@ -68,45 +66,18 @@ export default async function DashboardPage() {
   })[] = certificatesData ?? [];
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        <p className="text-slate-400 mt-2">
-          Welcome back, {user.email}. Here's what's happening with your certificates.
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <StatsGrid
-        totalEvents={events.length}
-        totalCertificates={totalCertificates ?? 0}
-        revokedCount={revokedCount ?? 0}
-        verificationCount={totalVerifications}
-      />
-
-      {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left Column - 2/3 width */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <EventManager events={events} />
-            <BulkImportUploader />
-          </div>
-          <ManualCertificateForm events={events} />
-          <RecentCertificates certificates={certificates} />
-        </div>
-
-        {/* Right Column - 1/3 width */}
-        <div className="lg:col-span-1 space-y-6">
-          <ActivityFeed recentCertificates={certificates} />
-          <AnalyticsChart certificates={certificates} />
-        </div>
-      </div>
-
-      {/* Quick Actions FAB */}
-      <QuickActions />
-    </div>
+    <AdminDashboardContent
+      userEmail={user.email || "admin"}
+      stats={{
+        totalEvents: events.length,
+        totalCertificates: totalCertificates ?? 0,
+        revokedCount: revokedCount ?? 0,
+        verificationCount: totalVerifications,
+        pendingUsers: pendingUsers ?? 0,
+      }}
+      events={events}
+      certificates={certificates}
+    />
   );
 }
 

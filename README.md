@@ -139,12 +139,10 @@ The API will be available at `http://localhost:3000/api`
 
 ## Certificate ID Format
 
-Certificates are automatically assigned IDs in the format:
-```
-{event-code}-{year}-{participant-name-slug}-{school-slug}
-```
+Certificates are automatically assigned **short IDs** that are easy to read and type.
+They are random-looking 6–8 character codes composed of lowercase letters and digits.
 
-Example: `igacmun-2025-osayeed-jaber-ijuw-hs`
+Example: `sbsj23`, `k9x4za`, `h2q7p1`.
 
 ## Workflow
 

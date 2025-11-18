@@ -29,10 +29,13 @@ export default function VerifyPage() {
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/5 p-4">
-              <img
+              <Image
                 src="/IGAC Logo White NOBG@4x-8 (1).png"
                 alt="IGAC Logo"
+                width={80}
+                height={80}
                 className="h-full w-full object-contain"
+                priority
               />
             </div>
           </div>

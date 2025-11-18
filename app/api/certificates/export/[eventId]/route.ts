@@ -4,11 +4,11 @@ import { requireAdmin } from '@/lib/utils/auth'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ eventId: string }> }
+  { params }: { params: { eventId: string } }
 ) {
   try {
     await requireAdmin()
-    const { eventId } = await params
+    const { eventId } = params
     const supabase = await createClient()
     
     // Get all certificates for the event
@@ -35,9 +35,15 @@ export async function GET(
     // Format data for export
     const exportData = (certificates as any[]).map((cert: any) => {
       const metadata = ((cert.certificate_metadata || []) as any[]).reduce((acc: any, meta: any) => {
-        acc[meta.field_name] = meta.field_type === 'json' || meta.field_type === 'array' 
-          ? JSON.parse(meta.field_value) 
-          : meta.field_value
+        if (meta.field_type === 'json' || meta.field_type === 'array') {
+          try {
+            acc[meta.field_name] = JSON.parse(meta.field_value);
+          } catch {
+            acc[meta.field_name] = meta.field_value;
+          }
+        } else {
+          acc[meta.field_name] = meta.field_value;
+        }
         return acc
       }, {})
       
