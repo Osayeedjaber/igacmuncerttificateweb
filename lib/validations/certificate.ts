@@ -89,25 +89,17 @@ export function getRequiredFields(certificateType: string): string[] {
   // Check if it's a known type in our definitions
   for (const typeCategory of Object.values(CERTIFICATE_TYPES)) {
     if (normalized in typeCategory) {
-      return typeCategory[normalized as keyof typeof typeCategory] || []
+      const fields = typeCategory[normalized as keyof typeof typeCategory] || []
+      // Map legacy 'name' to our actual field 'participant_name'
+      return fields
+        .map((f) => (f === 'name' ? 'participant_name' : f))
+        // Only enforce participant_name; all other fields are optional in the UI
+        .filter((f) => f === 'participant_name')
     }
   }
   
-  // Based on award category, determine required fields
-  switch (category) {
-    case 'MUN':
-      // MUN awards need country and committee
-      return ['name', 'school', 'country', 'committee', 'date_issued']
-    case 'BIZCOM':
-      // BizCom awards need segment and team_name
-      return ['name', 'school', 'segment', 'team_name', 'date_issued']
-    case 'SPECIAL_MENTION':
-      // Special mentions only need basic info
-      return ['name', 'school', 'date_issued']
-    default:
-      // For unknown types, only require basic fields
-      return ['name', 'school', 'date_issued']
-  }
+  // Fallback: only require participant_name; everything else is optional
+  return ['participant_name']
 }
 
 // Base certificate schema
