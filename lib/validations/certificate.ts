@@ -89,7 +89,7 @@ export function getRequiredFields(certificateType: string): string[] {
   // Check if it's a known type in our definitions
   for (const typeCategory of Object.values(CERTIFICATE_TYPES)) {
     if (normalized in typeCategory) {
-      const fields = typeCategory[normalized as keyof typeof typeCategory] || []
+      const fields = (typeCategory[normalized as keyof typeof typeCategory] || []) as string[]
       // Map legacy 'name' to our actual field 'participant_name'
       return fields
         .map((f) => (f === 'name' ? 'participant_name' : f))
