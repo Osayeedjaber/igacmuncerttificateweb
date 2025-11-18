@@ -8,6 +8,7 @@ import { DashboardIcon, CertificateIcon, EventIcon, UsersIcon } from "./Icons";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
+  { name: "Incoming", href: "/admin/dashboard/incoming-certificates", icon: "certificate" },
   { name: "Certificates", href: "/admin/dashboard/certificates", icon: "certificate" },
   { name: "Events", href: "/admin/dashboard/events", icon: "event" },
   { name: "Users", href: "/admin/dashboard/users", icon: "users" },
