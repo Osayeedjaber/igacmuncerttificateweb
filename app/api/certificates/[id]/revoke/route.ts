@@ -5,11 +5,11 @@ import { revocationSchema } from '@/lib/validations/certificate'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAdmin()
-    const { id } = params
+    const { id } = await params
     const supabase = createAdminClient()
     const body = await request.json()
     
