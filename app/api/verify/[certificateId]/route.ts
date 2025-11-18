@@ -2,25 +2,52 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 
+function normalizeCertificateId(raw: string): string {
+  const trimmed = raw.trim()
+  // Support IDs like "igacmun-session-3-2025-n9uwag" or URLs; take the last segment after '-' or '/'
+  const lastSegment = trimmed.split('/').pop() || trimmed
+  const parts = lastSegment.split('-')
+  return parts[parts.length - 1]
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ certificateId: string }> }
 ) {
   try {
     const { certificateId } = await params
+    const normalizedId = normalizeCertificateId(certificateId)
     const supabase = await createClient()
     
-    // Get certificate with all related data
-    const { data: certificate, error } = await supabase
+    // First attempt: exact match on certificate_id
+    let { data: certificate, error } = await supabase
       .from('certificates')
       .select(`
         *,
         events (*),
         certificate_metadata (*)
       `)
-      .eq('certificate_id', certificateId)
+      .eq('certificate_id', normalizedId)
       .single() as { data: any, error: any }
     
+    // Fallback: try a more lenient search in case of unexpected prefixes/suffixes
+    if ((error && error.code === 'PGRST116') || (!error && !certificate)) {
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('certificates')
+        .select(`
+          *,
+          events (*),
+          certificate_metadata (*)
+        `)
+        .ilike('certificate_id', `%${normalizedId}%`)
+        .limit(1)
+        .single() as { data: any, error: any }
+      if (!fallbackError && fallbackData) {
+        certificate = fallbackData
+        error = null
+      }
+    }
+
     if (error || !certificate) {
       return NextResponse.json(
         { 

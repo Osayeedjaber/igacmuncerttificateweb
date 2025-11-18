@@ -12,14 +12,20 @@ export default function VerifyPage() {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!certificateId.trim()) {
+    const raw = certificateId.trim();
+    if (!raw) {
       setError("Please enter a certificate ID");
       return;
     }
 
+    // Normalize input so both short IDs ("n9uwag") and full strings ("igacmun-session-3-2025-n9uwag") work
+    const lastSegment = raw.split('/').pop() || raw;
+    const parts = lastSegment.split('-');
+    const normalizedId = parts[parts.length - 1];
+
     setLoading(true);
     setError(null);
-    router.push(`/verify/${certificateId.trim()}`);
+    router.push(`/verify/${normalizedId}`);
   };
 
   return (
@@ -67,7 +73,7 @@ export default function VerifyPage() {
                     setCertificateId(e.target.value);
                     setError(null);
                   }}
-                  placeholder="Enter certificate ID (e.g., igacmun-session-3-2025-abc123)"
+                  placeholder="Enter certificate ID (e.g., n9uwag or igacmun-session-3-2025-n9uwag)"
                   className="w-full rounded-xl border border-white/10 bg-slate-950/50 px-12 py-4 text-white placeholder:text-slate-500 focus:border-emerald-500/50 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition"
                   disabled={loading}
                 />
