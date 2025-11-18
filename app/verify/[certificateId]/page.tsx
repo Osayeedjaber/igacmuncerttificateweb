@@ -26,7 +26,7 @@ type CertificateData = {
 export default function CertificateVerifyPage({
   params,
 }: {
-  params: Promise<{ certificateId: string }>;
+  params: { certificateId: string };
 }) {
   const router = useRouter();
   const [certificateId, setCertificateId] = useState<string>(params.certificateId);
