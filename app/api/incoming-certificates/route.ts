@@ -78,9 +78,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (eventError || !event) {
-      await sendDiscordNotification(
-        `incoming_certificates POST: event not found for code ${event_code}`
-      );
+      try {
+        await sendDiscordNotification(
+          `incoming_certificates POST: event not found for code ${event_code}`
+        );
+      } catch {
+        // Ignore notification errors so we can return a clear 404 to Sheets
+      }
       return NextResponse.json(
         { error: `Event with code "${event_code}" not found` },
         { status: 404 }
@@ -100,9 +104,13 @@ export async function POST(request: NextRequest) {
       .select();
 
     if (error) {
-      await sendDiscordNotification(
-        `incoming_certificates POST failed: ${error.message}`
-      );
+      try {
+        await sendDiscordNotification(
+          `incoming_certificates POST failed: ${error.message}`
+        );
+      } catch {
+        // Ignore notification errors
+      }
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -111,9 +119,13 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    await sendDiscordNotification(
-      `incoming_certificates POST exception: ${error.message || String(error)}`
-    );
+    try {
+      await sendDiscordNotification(
+        `incoming_certificates POST exception: ${error.message || String(error)}`
+      );
+    } catch {
+      // Ignore notification errors
+    }
     return NextResponse.json(
       { error: error.message || "Failed to stage incoming certificates" },
       { status: 500 }
