@@ -8,13 +8,13 @@ import { generateQRCode, uploadQRCodeToStorage } from "@/lib/utils/qr-code";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireSuperAdmin();
     const supabase = await createClient();
     const adminSupabase = createAdminClient();
-    const { id } = params;
+    const { id } = await params;
 
     // Load incoming row
     const { data: incoming, error: incomingError } = await (supabase as any)

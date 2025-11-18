@@ -4,10 +4,10 @@ import { headers } from 'next/headers'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { certificateId: string } }
+  { params }: { params: Promise<{ certificateId: string }> }
 ) {
   try {
-    const { certificateId } = params
+    const { certificateId } = await params
     const supabase = await createClient()
     
     // Get certificate with all related data

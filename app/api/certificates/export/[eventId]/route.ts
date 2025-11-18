@@ -4,11 +4,11 @@ import { requireAdmin } from '@/lib/utils/auth'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { eventId: string } }
+  { params }: { params: Promise<{ eventId: string }> }
 ) {
   try {
     await requireAdmin()
-    const { eventId } = params
+    const { eventId } = await params
     const supabase = await createClient()
     
     // Get all certificates for the event

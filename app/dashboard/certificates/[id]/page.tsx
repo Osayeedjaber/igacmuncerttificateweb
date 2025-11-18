@@ -1,9 +1,10 @@
 import { redirect } from 'next/navigation';
 
-export default function CertificateDetailPage({
+export default async function CertificateDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  redirect(`/admin/dashboard/certificates/${params.id}`);
+  const { id } = await params;
+  redirect(`/admin/dashboard/certificates/${id}`);
 }

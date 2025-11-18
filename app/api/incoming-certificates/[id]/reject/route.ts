@@ -5,12 +5,12 @@ import { sendDiscordNotification } from "@/lib/utils/discord";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireSuperAdmin();
     const adminSupabase = createAdminClient();
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json().catch(() => ({}));
     const reason = body.reason || "Rejected by admin";
 
